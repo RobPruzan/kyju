@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "bunchee",
-    "dev": "bunchee -w"
+    "dev": "nodemon --watch src --ext js,ts,tsx,jsx,css --exec \"npm run build && node ./src/build-success.js\"",
+    "build:css": "postcss ./src/styles.tailwind.css -o ./src/styles.css"
   },
   "repository": {
     "type": "git",
@@ -30,11 +31,17 @@
   "description": "",
   "devDependencies": {
     "bunchee": "^6.5.1",
-    "typescript": "^5.8.3"
+    "postcss": "^8.5.3",
+    "typescript": "^5.8.3",
+    "autoprefixer": "^10.4.21",
+    "tailwindcss": "^3",
+    "nodemon": "^3.0.0"
   },
   "dependencies": {
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
+    "framer-motion": "^12.11.3",
+    "postcss-cli": "^11.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   }

@@ -1,0 +1,60 @@
+- high level goals
+-
+- - performant/ergonomic API's for web stuff from a devtool perspective
+- - stuff like interaction tracker should be ported here
+- - network tracker
+- - UI components for devtool stuff that actually feels good to use
+- - most of react scan general logic encompassed by kyju
+- - canvas overlays
+- - server API's
+- - iframe API's
+- - it would be sick if it crossed iframe boundary automatically
+- - like imagine we can make react scan work cross iframe because of those API's
+- - and can use in zenbu
+- - web worker stuff
+- - easily deployable to NPM correctly: bunchee seems to fix that
+- - testing framework setup
+- - state management stuff
+- - inject other UI in it that grows to it and doesn't look out of place (solves multi devtool problem)
+- - websocket based communication
+- - overhead tracking and profiling for the devtool itself (maybe I can hook into chrome devtools for that, i'll have the ability to talk to seb)
+- - extension support?
+- - routing (this sounds like a lot but just simple devtool level routing that supports transitions perhaps and other stuff routing libs solve)
+- - assets
+- - shadow dom
+- - maybe it should be an iframe that communicates back to the parent? Not sure can explore that further
+- - throttling/batched updates back to server
+- - session replay thing in here
+- - gooey magnetic bar
+- - tailwind automatically setup
+- - inspect element stuff
+- - things that LLM app builders want to create
+- - hotkey daemon
+- - local storage migrations
+-
+-
+-
+- what would this look like to consume?
+-
+- some parts really don't need to be composable and can just be pure functions you run (maybe it should have some common api?)
+-
+- some parts should probably be composable but incrementally adoptable? Like
+- state management and routing, reactivity etc, iframe communication
+-
+- the ui stuff should probably be composable with state management/routing
+-
+- the migration stuff too that needs to be
+-
+- same for the profiling stuff it needs to get everything to be right
+-
+- server API's need to be good this is quite tricky and needs to handle all the cases you might have (think million lint)
+-
+- stacking stuff should be clear
+-
+- visual edits should be trivial if the API is built right, should not be hard
+-
+- everything should hot reload, so that's a starter we need, and we can do all of that for package management, hot reloading, web workers, fast build tools etc
+
+goals next, make a interaction tracking devtool, maybe networking?
+
+make it really good, dnd/magnetic/routing etc with react scan functionality
