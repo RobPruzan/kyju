@@ -2,4 +2,4 @@
 
 # Kyju
 
-A JavaScrit library for building performant and reliable devtools on the web
+A JavaScript library for building performant and reliable devtools on the web
