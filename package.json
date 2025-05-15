@@ -1,0 +1,41 @@
+{
+  "name": "kyju",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "type": "module",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "bunchee",
+    "dev": "bunchee -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobPruzan/kyju.git"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RobPruzan/kyju/issues"
+  },
+  "homepage": "https://github.com/RobPruzan/kyju#readme",
+  "description": "",
+  "devDependencies": {
+    "bunchee": "^6.5.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}
