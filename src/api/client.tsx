@@ -4,16 +4,16 @@ export const closureData = kyju.shared(2);
 const Component = () => {
   const iframeMutation = kyju.useMessage({
     destination: Destination.IFrame,
-    fn: (dependencies, state) => {
+    fn: (dependencies) => {
       "use remote";
-      state.closureAccumulation += closureData;
+      dependencies.closureAccumulation += closureData;
     },
   });
   const serverMutation = kyju.useMessage({
     destination: Destination.Server,
-    fn: async (dependencies, state) => {
+    fn: async (dependencies) => {
       "use remote";
-      state.closureAccumulation += closureData;
+      dependencies.closureAccumulation += closureData;
 
       await dependencies
         .db

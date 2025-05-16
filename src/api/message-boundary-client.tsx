@@ -1,9 +1,13 @@
 // @ts-nocheck
 import { KyjuStore } from "./shared";
 
+
+let closureAccumulation
+
 kyju.createDependencies({
   schema: Schema,
   db: db,
+  closureAccumulation
 });
 
 do {
