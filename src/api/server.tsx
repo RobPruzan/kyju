@@ -10,6 +10,7 @@ kyju.createDependencies(
   },
   {
     // all values here are accessible on client
+    // can think of this like an RPC, but u can access variables too
     closureAccumulationRef,
   }
 );
