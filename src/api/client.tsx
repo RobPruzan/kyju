@@ -8,7 +8,7 @@ export const clientClosure = kyju.state(2, {
 
 export const ClientStore = kyju.createDependencies(null, {
   window,
-  clientClosure
+  clientClosure,
 });
 
 const Component = () => {
@@ -43,7 +43,17 @@ const Component = () => {
 
   // composable allows other kyju devtools to merge together
   return (
-    <KyjuToolbar morph dnd magnetic hidable peekable composable>
+    <KyjuToolbar
+      onMessage={(event) => {
+        // an event from another kyju toolbar
+      }}
+      morph
+      dnd
+      magnetic
+      hidable
+      peekable
+      composable
+    >
       {/* extended canvas for efficient devtool visualizations */}
       {/* 3.js or custom 3d renderer here would be sick */}
       <Canvas
