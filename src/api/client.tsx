@@ -49,6 +49,7 @@ const Component = () => {
           console.log(await iframeFn()); // logs 69, await only needed when accessing data;
           kyju.server.setClosureAccumulation((prev) => prev + 1);
           // efficient async layout calculations
+          // kyju ships a customer profiler for devtool related operations so you can see how long this takes
           console.log(
             await kyju.queryLayout(document.getElementsByTagName("div"))
           );
