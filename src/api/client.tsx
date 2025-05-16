@@ -41,8 +41,9 @@ const Component = () => {
   const route = useRouter(); // non url based router, supports transitions + activity enabled
   const loaderData = useLoader(); // typed loaders
 
+  // composable allows other kyju devtools to merge together
   return (
-    <KyjuToolbar morph dnd magnetic hidable peekable>
+    <KyjuToolbar morph dnd magnetic hidable peekable composable>
       {/* extended canvas for efficient devtool visualizations */}
       {/* 3.js or custom 3d renderer here would be sick */}
       <Canvas
