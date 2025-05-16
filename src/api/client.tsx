@@ -1,5 +1,5 @@
 // @ts-nocheck
-export const clientClosure = kyju.shared(2);
+export const clientClosure = kyju.shared(2, {mode: 'persist', storage: localStorage});
 
 const Component = () => {
   const iframeFn = kyju.useMessage({
@@ -26,16 +26,27 @@ const Component = () => {
   const { iframeAccRef } = kyju.iframe.use();
   // cross browser support for tracking interactions made by user
   // can access automatically access interactions from remote iframes
-  const interactions = useInteractions(); 
+  const interactions = useInteractions();
+  const route = useRouter(); // non url based router
 
   return (
     <KyjuToolbar mode="morph">
+      {/* extended canvas for efficient devtool visualizations */}
+      <Canvas
+        onMount={(ctx, canvas) => {
+          ctx.stroke();
+        }}
+      />
       <button
         onClick={() => {
           clientClosure += 1;
           serverMutation.mutate();
           console.log(await iframeFn()); // logs 69, await only needed when accessing data;
           kyju.server.setClosureAccumulation((prev) => prev + 1);
+          // efficient async layout calculations
+          console.log(
+            await kyju.queryLayout(document.getElementsByTagName("div"))
+          );
         }}
       >
         client accumulation: {clientClosure}
@@ -43,7 +54,7 @@ const Component = () => {
         iframe accumulation: {iframeAccRef.current}
       </button>
       {JSON.stringify(interactions)}
-
+      {/* react query wrapper */}
       {contentMutation.error && <>{serverMutation.error}</>}
     </KyjuToolbar>
   );
