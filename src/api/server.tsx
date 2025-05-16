@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { KyjuStore } from "./shared";
+import { ClientStore } from "./shared";
 
 let closureAccumulationRef = { current: 0 };
 
-kyju.createDependencies(
+export const ServerStore = kyju.createDependencies(
   {
     schema: Schema,
     db: db,
@@ -25,7 +25,7 @@ while (true) {
   // console.log + fetch visible from browser via devtools
   await fetch("/report-data", {
     method: "POST",
-    body: KyjuStore.clientClosure + closureAccumulationRef.current,
+    body: ClientStore.clientClosure + closureAccumulationRef.current,
   })
     .then((res) => res.json())
     .then(console.log);

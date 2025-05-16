@@ -6,8 +6,9 @@ export const clientClosure = kyju.state(2, {
   mcpOptions: { ...null },
 });
 
-kyju.createDependencies(null, {
+export const ClientStore = kyju.createDependencies(null, {
   window,
+  clientClosure
 });
 
 const Component = () => {
