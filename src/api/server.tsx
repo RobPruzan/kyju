@@ -7,6 +7,7 @@ kyju.createDependencies(
   {
     schema: Schema,
     db: db,
+    os: os
   },
   {
     // all values here are accessible on client

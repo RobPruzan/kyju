@@ -20,7 +20,7 @@ const Component = () => {
     fn: async (dependencies) => {
       "use remote";
       dependencies.closureAccumulationRef.current += clientClosure;
-
+      console.log(dependencies.os.cwd());
       await dependencies.db.insert(dependencies.Schema.accumulations).values({
         dependencies,
       });
