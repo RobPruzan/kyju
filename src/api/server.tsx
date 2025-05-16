@@ -7,7 +7,7 @@ kyju.createDependencies(
   {
     schema: Schema,
     db: db,
-    os: os
+    os: os,
   },
   {
     // all values here are accessible on client
@@ -16,6 +16,12 @@ kyju.createDependencies(
   }
 );
 while (true) {
+  kyju.message({
+    destination: currentTabId,
+    fn: (dependencies) => {
+      console.log(dependencies.window.getElementById("data").value);
+    },
+  });
   // console.log + fetch visible from browser via devtools
   await fetch("/report-data", {
     method: "POST",

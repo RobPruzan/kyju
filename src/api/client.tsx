@@ -1,9 +1,13 @@
 // @ts-nocheck
 export const clientClosure = kyju.state(2, {
   mode: "persist",
-  storage: localStorage,
+  storage: localStorage, // because devtool state should persist when the user wants to reload to-debug website
   // automatic MCP configuration (minimal info passed to create an MPC from state)
   mcpOptions: { ...null },
+});
+
+kyju.createDependencies(null, {
+  window,
 });
 
 const Component = () => {
@@ -15,6 +19,7 @@ const Component = () => {
       return window.iframeData;
     },
   });
+  // if your query/mutation is slow, you can let react query take control
   const serverMutation = kyju.useQueryMessage({
     destination: Destination.Server,
     fn: async (dependencies) => {
@@ -30,13 +35,15 @@ const Component = () => {
   const { closureAccumulationRef } = kyju.server.use();
   const { iframeAccRef } = kyju.iframe.use();
   // cross browser support for tracking interactions made by user
-  // can access automatically access interactions from remote iframes
+  // can automatically access interactions from remote iframes
   const interactions = useInteractions();
-  const route = useRouter(); // non url based router
+  const route = useRouter(); // non url based router, supports transitions + activity enabled
+  const loaderData = useLoader(); // typed loaders
 
   return (
     <KyjuToolbar morph dnd magnetic hidable peekable>
       {/* extended canvas for efficient devtool visualizations */}
+      {/* 3.js or custom 3d renderer here would be sick */}
       <Canvas
         onMount={(ctx, canvas) => {
           ctx.stroke();
