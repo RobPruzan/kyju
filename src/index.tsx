@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import "./styles.css";
 import { iife, startTimingTracking, toolbarEventStore } from "./utils";
+import { observeRequests } from "./network/network";
 
 export const Toolbar = () => {
   const [open, setOpen] = useState(false);
@@ -11,6 +12,8 @@ export const Toolbar = () => {
     toolbarEventStore.getState
   );
 
+  console.log("state ", toolbarState);
+
   useEffect(() => {
     const unSub = startTimingTracking();
 
@@ -18,6 +21,24 @@ export const Toolbar = () => {
       unSub();
     };
   }, []);
+
+  const [requests, setRequests] = useState<Array<PerformanceResourceTiming>>(
+    []
+  );
+
+  useEffect(() => {
+    /**
+     * tings I need for interaction -> network request
+     *
+     * just map it?
+     */
+    const unSub = observeRequests((data) => {
+      setRequests((prev) => [...prev, data]);
+      console.log("req", data, performance.timeOrigin);
+    });
+    return unSub;
+  }, []);
+  console.log("requests", requests);
 
   return (
     <motion.div
@@ -41,10 +62,31 @@ export const Toolbar = () => {
                 {iife(() => {
                   switch (event.kind) {
                     case "interaction": {
+                      const associatedRequests = requests.filter(
+                        (req) =>
+                          req.startTime >=
+                            event.data.meta.detailedTiming.start &&
+                          req.startTime <=
+                            event.data.meta.detailedTiming.jsEndDetail
+                      );
                       return (
                         <div>
                           {event.data.meta.detailedTiming.componentName}:{" "}
                           {event.data.meta.latency.toFixed(2)}ms
+                          {associatedRequests.length !== 0 && (
+                            <div className="border-t w-full ml-4">
+                              <span className="font-bold">Requests</span>
+
+                              {associatedRequests.map((req) => (
+                                <div>
+                                  <span>url: {req.name}</span>
+                                  <span>
+                                    duration: {req.duration.toFixed(2)}ms{" "}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       );
                     }

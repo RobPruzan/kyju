@@ -27,6 +27,7 @@ type InteractionStartStage = {
   blockingTimeStart: number;
   componentPath: Array<string>;
   componentName: string;
+  start: number
 };
 
 type JSEndStage = Omit<InteractionStartStage, "kind"> & {
@@ -486,6 +487,7 @@ export const setupDetailedPointerTimingListener = (
       componentPath: details.componentPath,
       kind: "interaction-start",
       interactionStartDetail: pointerUpStart,
+      start: performance.now()
     };
 
     const event = getEvent({ phase: "end", target: e.target as Element });
