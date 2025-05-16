@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { closureData } from "./client";
+import { clientClosure } from "./client";
 
 export const KyjuStore = createSharedStore(() => ({
-  closureData,
+  clientClosure,
 }));
