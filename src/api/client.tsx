@@ -19,8 +19,9 @@ const Component = () => {
       await dependencies.db.insert(dependencies.Schema.accumulations).values({
         dependencies,
       });
-    },
+    }, 
   });
+  // these can also run in parallel to avoid waterfall
   const { closureAccumulationRef } = kyju.server.use();
   const { iframeAccRef } = kyju.iframe.use();
 
