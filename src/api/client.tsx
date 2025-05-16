@@ -1,5 +1,11 @@
 // @ts-nocheck
-export const clientClosure = kyju.shared(2, {mode: 'persist', storage: localStorage});
+export const clientClosure = kyju.shared(2, {
+  mode: "persist",
+  storage: localStorage,
+  // automatic MCP configuration (minimal info passed to create an MPC from state)
+  mcpOptions: {...null} 
+  
+});
 
 const Component = () => {
   const iframeFn = kyju.useMessage({
