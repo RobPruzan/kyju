@@ -1,0 +1,4 @@
+// @ts-nocheck
+config({
+  ServerStore,
+});

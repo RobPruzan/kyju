@@ -1,0 +1,5 @@
+
+// @ts-nocheck
+config({
+  ClientStore,
+})
