@@ -21,6 +21,7 @@ const Component = () => {
     },
   });
   const {closureAccumulationRef} = kyju.server.use()
+  const {iframeAccRef} = kyju.iframe.use()
 
   return (
     <div>
@@ -33,7 +34,8 @@ const Component = () => {
         }}
       >
         client accumulation: {clientClosure}
-        server accumulation: {kyju.closureAccumulationRef.current}
+        server accumulation: {closureAccumulationRef.current}
+        iframe accumulation: {iframeAccRef.current}
       </button>
 
       {contentMutation.error && <>{serverMutation.error}</>}
