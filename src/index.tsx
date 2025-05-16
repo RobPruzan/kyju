@@ -1,9 +1,23 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import "./styles.css";
+import { iife, startTimingTracking, toolbarEventStore } from "./utils";
 
 export const Toolbar = () => {
   const [open, setOpen] = useState(false);
+
+  const toolbarState = useSyncExternalStore(
+    toolbarEventStore.subscribe,
+    toolbarEventStore.getState
+  );
+
+  useEffect(() => {
+    const unSub = startTimingTracking();
+
+    return () => {
+      unSub();
+    };
+  }, []);
 
   return (
     <motion.div
@@ -14,13 +28,36 @@ export const Toolbar = () => {
       }}
       transition={{
         duration: 0.25,
-        // bounce: 0.25,
         bounce: 0,
         type: "spring",
       }}
       layout
     >
-      <motion.div className="h-[calc(100%-30px)] w-full"></motion.div>
+      <motion.div className="h-[calc(100%-30px)] w-full text-white">
+        {open && (
+          <div className="flex flex-col">
+            {toolbarState.state.events.map((event) => (
+              <div>
+                {iife(() => {
+                  switch (event.kind) {
+                    case "interaction": {
+                      return (
+                        <div>
+                          {event.data.meta.detailedTiming.componentName}:{" "}
+                          {event.data.meta.latency.toFixed(2)}ms
+                        </div>
+                      );
+                    }
+                    case "long-render": {
+                      return <div>fps: {event.data.meta.fps}</div>;
+                    }
+                  }
+                })}
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
       <motion.div className="h-[30px] w-full border-t flex justify-end">
         <AnimatePresence mode="wait">
           <motion.button

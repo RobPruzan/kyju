@@ -402,7 +402,8 @@ export function startLongPipelineTracking() {
   let timeoutHandle: ReturnType<typeof setTimeout>;
 
   function measure() {
-    let unSub: (() => void) | null = null;
+    // todo: actually idk if we need anything in react scan this was only used for render tracking, i think internally it cancels
+    let unSub: (() => void) | null = () => {};
     const startOrigin = performance.timeOrigin;
     const startTime = performance.now();
     rafHandle = requestAnimationFrame(() => {
@@ -544,3 +545,7 @@ export const startTimingTracking = () => {
     unSubDetailedKeyboardTiming();
   };
 };
+
+
+
+export const iife = <T>(f: () => T) => f()
