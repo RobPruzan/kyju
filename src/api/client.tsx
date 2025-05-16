@@ -6,21 +6,21 @@ const Component = () => {
     destination: Destination.IFrame,
     fn: (dependencies) => {
       "use remote";
-      dependencies.closureAccumulation += clientClosure;
+      dependencies.closureAccumulationRef.current += clientClosure;
     },
   });
   const serverMutation = kyju.useMessage({
     destination: Destination.Server,
     fn: async (dependencies) => {
       "use remote";
-      dependencies.closureAccumulation += clientClosure;
+      dependencies.closureAccumulationRef.current += clientClosure;
 
       await dependencies.db.insert(dependencies.Schema.accumulations).values({
         dependencies,
       });
     },
   });
-  const {closureAccumulation} = kyju.server.use()
+  const {closureAccumulationRef} = kyju.server.use()
 
   return (
     <div>
@@ -33,7 +33,7 @@ const Component = () => {
         }}
       >
         client accumulation: {closureData}
-        server accumulation: {kyju.closureAccumulation}
+        server accumulation: {kyju.closureAccumulationRef.current}
       </button>
 
       {contentMutation.error && <>{serverMutation.error}</>}
