@@ -1,5 +1,7 @@
-
 // @ts-nocheck
-config({
-  IFrameStore
-})
+const client = config({
+  IFrameStore,
+});
+
+
+export type IFrameClient = typeof client

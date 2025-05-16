@@ -1,5 +1,6 @@
-
 // @ts-nocheck
-config({
+const client = config({
   ClientStore,
-})
+});
+// allows for typed rpc
+export type FrontendClient = typeof client;
