@@ -1,7 +1,11 @@
+import { createStore } from "./create-store";
+import { interactionStore, MAX_INTERACTION_BATCH } from "./interaction-store";
 import {
+  listenForPerformanceEntryInteractions,
   PerformanceEntryChannelEvent,
   PerformanceInteraction,
   PerformanceInteractionEntry,
+  setupDetailedPointerTimingListener,
   TimeoutStage,
 } from "./performance";
 import {
@@ -35,7 +39,6 @@ const trackVisibilityChange = () => {
   };
 };
 
-
 const getInteractionType = (
   eventName: string
 ): "pointer" | "keyboard" | null => {
@@ -50,7 +53,6 @@ const getInteractionType = (
   }
   return null;
 };
-
 
 let onEntryAnimationId: number | null = null;
 
@@ -196,7 +198,7 @@ let previousTrackCurrentMouseOverElementCallback:
 
 let overToolbar: boolean | null;
 
-const trackCurrentMouseOverToolbar = (toolbarId ?:string) => {
+const trackCurrentMouseOverToolbar = (toolbarId?: string) => {
   const callback = (e: MouseEvent) => {
     overToolbar = e
       .composedPath()
@@ -218,119 +220,128 @@ const trackCurrentMouseOverToolbar = (toolbarId ?:string) => {
   };
 };
 
-export const toolbarEventStore = createStore<ToolbarEventStoreState>()((
-  set,
-  get
-) => {
-  const listeners = new Set<(event: SlowdownEvent) => void>();
+type ToolbarEventStoreState = {
+  state: {
+    events: Array<SlowdownEvent>;
+  };
+  actions: {
+    addEvent: (event: SlowdownEvent) => void;
+    addListener: (listener: (event: SlowdownEvent) => void) => () => void;
+    clear: () => void;
+  };
+};
+export const toolbarEventStore = createStore<ToolbarEventStoreState>()(
+  (set, get) => {
+    const listeners = new Set<(event: SlowdownEvent) => void>();
 
-  return {
-    state: {
-      events: [],
-    },
+    return {
+      state: {
+        events: [],
+      },
 
-    actions: {
-      addEvent: (event: SlowdownEvent) => {
-        listeners.forEach((listener) => listener(event));
+      actions: {
+        addEvent: (event: SlowdownEvent) => {
+          listeners.forEach((listener) => listener(event));
 
-        const events = [...get().state.events, event];
-        const applyOverlapCheckToLongRenderEvent = (
-          longRenderEvent: LongRenderPipeline & { id: string },
-          onOverlap: (overlapsWith: InteractionEvent & { id: string }) => void
-        ) => {
-          const overlapsWith = events.find((event) => {
-            if (event.kind === "long-render") {
-              return;
-            }
+          const events = [...get().state.events, event];
+          const applyOverlapCheckToLongRenderEvent = (
+            longRenderEvent: LongRenderPipeline & { id: string },
+            onOverlap: (overlapsWith: InteractionEvent & { id: string }) => void
+          ) => {
+            const overlapsWith = events.find((event) => {
+              if (event.kind === "long-render") {
+                return;
+              }
 
-            if (event.id === longRenderEvent.id) {
-              return;
-            }
+              if (event.id === longRenderEvent.id) {
+                return;
+              }
 
-            /**
-             * |---x-----------x------ (interaction)
-             * |x-----------x          (long-render)
-             */
+              /**
+               * |---x-----------x------ (interaction)
+               * |x-----------x          (long-render)
+               */
 
-            if (
-              longRenderEvent.data.startAt <= event.data.startAt &&
-              longRenderEvent.data.endAt <= event.data.endAt &&
-              longRenderEvent.data.endAt >= event.data.startAt
-            ) {
-              return true;
-            }
+              if (
+                longRenderEvent.data.startAt <= event.data.startAt &&
+                longRenderEvent.data.endAt <= event.data.endAt &&
+                longRenderEvent.data.endAt >= event.data.startAt
+              ) {
+                return true;
+              }
 
-            /**
+              /**
              * |x-----------x---- (interaction)
              * |--x------------x  (long-render)
              *
 
              */
 
-            if (
-              event.data.startAt <= longRenderEvent.data.startAt &&
-              event.data.endAt >= longRenderEvent.data.startAt
-            ) {
-              return true;
+              if (
+                event.data.startAt <= longRenderEvent.data.startAt &&
+                event.data.endAt >= longRenderEvent.data.startAt
+              ) {
+                return true;
+              }
+
+              /**
+               *
+               * |--x-------------x    (interaction)
+               * |x------------------x (long-render)
+               *
+               */
+
+              if (
+                longRenderEvent.data.startAt <= event.data.startAt &&
+                longRenderEvent.data.endAt >= event.data.endAt
+              ) {
+                return true;
+              }
+            }) as undefined | (InteractionEvent & { id: string }); // invariant: because we early check the typechecker does not know it must be the case that when it finds something, it will be an interaction it overlaps with
+
+            if (overlapsWith) {
+              onOverlap(overlapsWith);
             }
+          };
 
-            /**
-             *
-             * |--x-------------x    (interaction)
-             * |x------------------x (long-render)
-             *
-             */
+          const toRemove = new Set<string>();
 
-            if (
-              longRenderEvent.data.startAt <= event.data.startAt &&
-              longRenderEvent.data.endAt >= event.data.endAt
-            ) {
-              return true;
-            }
-          }) as undefined | (InteractionEvent & { id: string }); // invariant: because we early check the typechecker does not know it must be the case that when it finds something, it will be an interaction it overlaps with
-
-          if (overlapsWith) {
-            onOverlap(overlapsWith);
-          }
-        };
-
-        const toRemove = new Set<string>();
-
-        events.forEach((event) => {
-          if (event.kind === "interaction") return;
-          applyOverlapCheckToLongRenderEvent(event, () => {
-            toRemove.add(event.id);
+          events.forEach((event) => {
+            if (event.kind === "interaction") return;
+            applyOverlapCheckToLongRenderEvent(event, () => {
+              toRemove.add(event.id);
+            });
           });
-        });
 
-        const withRemovedEvents = events.filter(
-          (event) => !toRemove.has(event.id)
-        );
+          const withRemovedEvents = events.filter(
+            (event) => !toRemove.has(event.id)
+          );
 
-        set(() => ({
-          state: {
-            events: withRemovedEvents,
-          },
-        }));
+          set(() => ({
+            state: {
+              events: withRemovedEvents,
+            },
+          }));
+        },
+
+        addListener: (listener: (event: SlowdownEvent) => void) => {
+          listeners.add(listener);
+          return () => {
+            listeners.delete(listener);
+          };
+        },
+
+        clear: () => {
+          set({
+            state: {
+              events: [],
+            },
+          });
+        },
       },
-
-      addListener: (listener: (event: SlowdownEvent) => void) => {
-        listeners.add(listener);
-        return () => {
-          listeners.delete(listener);
-        };
-      },
-
-      clear: () => {
-        set({
-          state: {
-            events: [],
-          },
-        });
-      },
-    },
-  };
-});
+    };
+  }
+);
 type InteractionEvent = {
   kind: "interaction";
   data: {
@@ -358,10 +369,10 @@ type LongRenderPipeline = {
 export type SlowdownEvent = (InteractionEvent | LongRenderPipeline) & {
   id: string;
 };
-export const IS_CLIENT = typeof window !== 'undefined';
+export const IS_CLIENT = typeof window !== "undefined";
 export const not_globally_unique_generateId = () => {
   if (!IS_CLIENT) {
-    return '0';
+    return "0";
   }
 
   // @ts-expect-error
@@ -425,7 +436,6 @@ export function startLongPipelineTracking() {
           const endAt = endOrigin + endNow;
           const startAt = startTime + startOrigin;
 
-
           toolbarEventStore.getState().actions.addEvent({
             kind: "long-render",
             id: not_globally_unique_generateId(),
@@ -476,7 +486,6 @@ export const startTimingTracking = () => {
     finalInteraction: FinalInteraction,
     event: PerformanceEntryChannelEvent
   ) => {
-
     toolbarEventStore.getState().actions.addEvent({
       kind: "interaction",
       id: not_globally_unique_generateId(),
@@ -489,7 +498,6 @@ export const startTimingTracking = () => {
 
     const existingCompletedInteractions =
       performanceEntryChannels.getChannelState("recording");
-
 
     if (existingCompletedInteractions.length) {
       // then performance entry and our detailed timing handlers are out of sync, we disregard that entry
@@ -505,13 +513,7 @@ export const startTimingTracking = () => {
     "pointer",
     {
       onComplete,
-      onStart: () => {
-        interactionSubscribers.forEach((listener) => {
-          listener({
-            kind: "interaction-start",
-          });
-        });
-      },
+      onStart: () => {},
     }
   );
   const unSubDetailedKeyboardTiming = setupDetailedPointerTimingListener(
@@ -542,4 +544,3 @@ export const startTimingTracking = () => {
     unSubDetailedKeyboardTiming();
   };
 };
-

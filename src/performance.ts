@@ -7,6 +7,7 @@ import {
   traverseFiber,
 } from "bippy";
 import { not_globally_unique_generateId } from "./utils";
+import { performanceEntryChannels } from "./performance-store";
 
 export type PerformanceEntryChannelEvent =
   | {
@@ -707,4 +708,60 @@ export const setupDetailedPointerTimingListener = (
     // biome-ignore lint/suspicious/noExplicitAny: shut up biome
     document.removeEventListener("keypress", onKeyPress as any);
   };
+};
+
+
+const getAssociatedDetailedTimingInteraction = (
+  entry: PerformanceInteraction,
+  activeTasks: Array<Task>
+) => {
+  let closestTask: Task | null = null;
+  for (const task of activeTasks) {
+    if (task.type !== entry.type) {
+      continue;
+    }
+
+    if (closestTask === null) {
+      closestTask = task;
+      continue;
+    }
+
+    const getAbsoluteDiff = (task: Task, entry: PerformanceInteraction) =>
+      Math.abs(task.startDateTime) - (entry.startTime + entry.timeOrigin);
+
+    if (getAbsoluteDiff(task, entry) < getAbsoluteDiff(closestTask, entry)) {
+      closestTask = task;
+    }
+  }
+
+  return closestTask;
+};
+
+
+export const listenForPerformanceEntryInteractions = (
+  onComplete: (completedInteraction: CompletedInteraction) => void
+) => {
+  // we make the assumption that the detailed timing will be ready before the performance timing
+  const unsubscribe = performanceEntryChannels.subscribe(
+    "recording",
+    (event) => {
+      const associatedDetailedInteraction =
+        event.kind === "auto-complete-race"
+          ? tasks.find((task) => task.interactionUUID === event.interactionUUID)
+          : getAssociatedDetailedTimingInteraction(event.entry, tasks);
+
+      // REMINDME: this likely means we clicked a non interactable thing but our handler still ran
+      // so we shouldn't treat this as an invariant, but instead use it to verify if we clicked
+      // something interactable
+      if (!associatedDetailedInteraction) {
+        return;
+      }
+
+      const completedInteraction =
+        associatedDetailedInteraction.completeInteraction(event);
+      onComplete(completedInteraction);
+    }
+  );
+
+  return unsubscribe;
 };
