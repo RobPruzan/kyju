@@ -19,11 +19,14 @@ const Component = () => {
       await dependencies.db.insert(dependencies.Schema.accumulations).values({
         dependencies,
       });
-    }, 
+    },
   });
   // these can also run in parallel to avoid waterfall
   const { closureAccumulationRef } = kyju.server.use();
   const { iframeAccRef } = kyju.iframe.use();
+  // cross browser support for tracking interactions made by user
+  // can access automatically access interactions from remote iframes
+  const interactions = useInteractions(); 
 
   return (
     <KyjuToolbar mode="morph">
@@ -39,6 +42,7 @@ const Component = () => {
         server accumulation: {closureAccumulationRef.current}
         iframe accumulation: {iframeAccRef.current}
       </button>
+      {JSON.stringify(interactions)}
 
       {contentMutation.error && <>{serverMutation.error}</>}
     </KyjuToolbar>
