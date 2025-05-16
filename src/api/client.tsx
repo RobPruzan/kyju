@@ -26,7 +26,7 @@ const Component = () => {
   const { iframeAccRef } = kyju.iframe.use();
 
   return (
-    <div>
+    <KyjuToolbar mode="morph">
       <button
         onClick={() => {
           clientClosure += 1;
@@ -41,6 +41,6 @@ const Component = () => {
       </button>
 
       {contentMutation.error && <>{serverMutation.error}</>}
-    </div>
+    </KyjuToolbar>
   );
 };
