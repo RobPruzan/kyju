@@ -2,14 +2,15 @@
 export const clientClosure = kyju.shared(2);
 
 const Component = () => {
-  const iframeMutation = kyju.useMessage({
+  const iframeFn = kyju.useMessage({
     destination: Destination.IFrame,
     fn: (dependencies) => {
       "use remote";
       dependencies.iframeAccRef.current += clientClosure;
+      return window.iframeData;
     },
   });
-  const serverMutation = kyju.useMessage({
+  const serverMutation = kyju.useQueryMessage({
     destination: Destination.Server,
     fn: async (dependencies) => {
       "use remote";
@@ -20,17 +21,17 @@ const Component = () => {
       });
     },
   });
-  const {closureAccumulationRef} = kyju.server.use()
-  const {iframeAccRef} = kyju.iframe.use()
+  const { closureAccumulationRef } = kyju.server.use();
+  const { iframeAccRef } = kyju.iframe.use();
 
   return (
     <div>
       <button
         onClick={() => {
-          clientClosure += 1
+          clientClosure += 1;
           serverMutation.mutate();
-          iframeMutation.mutate();
-          kyju.server.setClosureAccumulation(prev => prev + 1)
+          console.log(await iframeFn()); // logs 69;
+          kyju.server.setClosureAccumulation((prev) => prev + 1);
         }}
       >
         client accumulation: {clientClosure}
