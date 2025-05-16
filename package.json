@@ -30,16 +30,17 @@
   "homepage": "https://github.com/RobPruzan/kyju#readme",
   "description": "",
   "devDependencies": {
-    "bunchee": "^6.5.1",
-    "postcss": "^8.5.3",
-    "typescript": "^5.8.3",
     "autoprefixer": "^10.4.21",
+    "bunchee": "^6.5.1",
+    "nodemon": "^3.0.0",
+    "postcss": "^8.5.3",
     "tailwindcss": "^3",
-    "nodemon": "^3.0.0"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
+    "bippy": "^0.3.11",
     "framer-motion": "^12.11.3",
     "postcss-cli": "^11.0.1",
     "react": "^19.1.0",
