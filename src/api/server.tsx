@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { KyjuStore } from "./shared";
 
-let closureAccumulationRef = { current: 0};
+let closureAccumulationRef = { current: 0 };
 
 kyju.createDependencies(
   {
