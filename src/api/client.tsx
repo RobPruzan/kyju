@@ -35,7 +35,7 @@ const Component = () => {
   const route = useRouter(); // non url based router
 
   return (
-    <KyjuToolbar mode="morph">
+    <KyjuToolbar morph dnd magnetic hidable peekable>
       {/* extended canvas for efficient devtool visualizations */}
       <Canvas
         onMount={(ctx, canvas) => {
