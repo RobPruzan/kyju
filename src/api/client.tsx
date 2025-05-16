@@ -6,7 +6,7 @@ const Component = () => {
     destination: Destination.IFrame,
     fn: (dependencies) => {
       "use remote";
-      dependencies.closureAccumulationRef.current += clientClosure;
+      dependencies.iframeAccRef.current += clientClosure;
     },
   });
   const serverMutation = kyju.useMessage({
@@ -32,7 +32,7 @@ const Component = () => {
           kyju.server.setClosureAccumulation(prev => prev + 1)
         }}
       >
-        client accumulation: {closureData}
+        client accumulation: {clientClosure}
         server accumulation: {kyju.closureAccumulationRef.current}
       </button>
 
