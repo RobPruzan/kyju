@@ -30,7 +30,7 @@ const Component = () => {
         onClick={() => {
           clientClosure += 1;
           serverMutation.mutate();
-          console.log(await iframeFn()); // logs 69;
+          console.log(await iframeFn()); // logs 69, await only needed when accessing data;
           kyju.server.setClosureAccumulation((prev) => prev + 1);
         }}
       >
