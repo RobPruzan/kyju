@@ -14,7 +14,7 @@ Building devtools on the web requires arcane browser knowledge. Existing tools a
 - re-inventing flexible toolbars that don't get in the users way when developing
 - determining how much overhead your devtool is adding to the application
 - setting up modern tooling and fighting with bundling configurations
-- state managment outside of a "UI" based devtool
+- state managment outside of the "main UI" lifetime
 - making the data you collect in the devtool accessible to LLM's
 - automatically hiding the devtool when the user builds for production, while optionally allowing the devtool to run in production
 
