@@ -16,6 +16,7 @@ Building devtools on the web requires arcane browser knowledge. Existing tools a
 - setting up modern tooling and fighting with bundling configurations
 - state managment outside of a "UI" based devtool
 - making the data you collect in the devtool accessible to LLM's
+- automatically hiding the devtool when the user builds for production, while optionally allowing the devtool to run in production
 
 Conceptually, most devtools are not complicated, since they tend to follow the pattern of:
 - collecting some data
