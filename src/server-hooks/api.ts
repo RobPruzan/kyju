@@ -36,5 +36,11 @@ export const useDistributedState = <T>(initialState: T) => {
 export const createDistributedContext = <T>(name: string): idk<T> => ({
   Provider: ({ children }) => children,
 });
+// can render to external target by making clients browser an "ssr engine", and
+// sending it to a local server that can distribute the html, and then maps
+// event handlers back to ones defined in runtime (application code)
 
+
+// this can allow for automatically synced devtools that move between website and vscode/cursor boundary, since
+// webview in electron would be reading from the same source, and they are connected to a hot reloader
 export const IFrame = ({ children }: { children: React.ReactNode }) => children;

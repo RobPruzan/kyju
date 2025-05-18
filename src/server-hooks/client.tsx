@@ -19,7 +19,7 @@ export const Example = () => {
       return count + pid; // why not
     },
   });
-
+  // can render to kyju toolbar, or to an external iframe
   return <kyju.IFrame>{weirdPid}</kyju.IFrame>;
 };
 
