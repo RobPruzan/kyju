@@ -22,11 +22,14 @@ export const ExampleApp = () => {
 };
 
 const remoteConfig = {
-  kind: "ws", // iframe supported
+  kind: "ws", // iframe also supported
   // url: custom, or default
 };
 
 export const Example = () => {
+  // might explore this as a component, since that feels more like a "Server",
+  // but idk need to play with it, idk but do u want that? the 2 explicit case
+  // are initialization, and functions, both of which work fine with this interface
   const weirdPid = kyju.useRemoteHook({
     remoteConfig,
     fn: ({ dependencies }) => {
