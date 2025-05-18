@@ -20,7 +20,22 @@ export const Example = () => {
     },
   });
   // can render to kyju toolbar, or to an external iframe
-  return <kyju.IFrame>{weirdPid}</kyju.IFrame>;
+  return (
+    <kyju.IFrame
+      context={{
+        weirdPid,
+      }}
+    >
+      <MillionLint />
+    </kyju.IFrame>
+  );
+};
+
+const MillionLint = () => {
+  // live synced with parent state
+  const { weirdPid } = kyju.useDistributedContext("$parent-window");
+
+  return <div>{weirdPid}</div>;
 };
 
 export const App = () => {

@@ -43,4 +43,4 @@ export const createDistributedContext = <T>(name: string): idk<T> => ({
 
 // this can allow for automatically synced devtools that move between website and vscode/cursor boundary, since
 // webview in electron would be reading from the same source, and they are connected to a hot reloader
-export const IFrame = ({ children }: { children: React.ReactNode }) => children;
+export const IFrame = ({ children,context }: { children: React.ReactNode, context:any }) => children;
