@@ -22,7 +22,7 @@ export const ExampleApp = () => {
 };
 
 const remoteConfig = {
-  kind: "ws", // iframe also supported
+  kind: "ws", // iframe also  supported
   // url: custom, or default
 };
 
@@ -37,13 +37,20 @@ export const Example = () => {
       const { count } = dependencies.someFunction();
       const { setCount } =
         kyju.useDistributedContext<typeof IdkContext>("IdkContext");
-      // and hypothetically push data back to the browser from playwright events!
+      // and hypothetically push data back to the browser from playwright events
       setCount((count) => count + 1);
       const pid = dependencies.process.pid;
       return count + pid; // why not
     },
   });
   // can render to kyju toolbar, or to an external iframe
+  // what if entrypoints are just leaf nodes
+  // wait why can't they communicate back and fourth that should be fine?
+  // so u have a "iframe" entrypoint, which you define it in a trpc like router,
+  // and render here. 2 way holes? that would allow you to entrypoint iframe
+  // components too just to get minimal data from iframe environment. Hmmmm.
+  // which do you want more? Then it must be interleave-able, you should be able
+  // to transition between both.
   return <kyju.IFrame weirdPid={weirdPid} name="idk" />;
 };
 
@@ -64,6 +71,24 @@ const Devtool = ({ weirdPid }: any) => {
     <div>
       count:{count}
       weird pid: {weirdPid}
+      <kyju.IFrame name="iframe-controlled" />
     </div>
   );
+};
+
+// another file boundary
+
+export const IFrameEntrypoint = () => {
+  return (
+    <kyju.Controlled name="iframe-controlled">
+      <IFrameDevtool />
+    </kyju.Controlled>
+  );
+};
+
+const IFrameDevtool = () => {
+  const { count } = kyju.useDistributedContext<typeof IdkContext>("IdkContext");
+  return <div>
+    {count}
+  </div>;
 };
