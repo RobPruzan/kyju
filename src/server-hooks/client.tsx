@@ -63,7 +63,7 @@ export const ParentWindowApp = () => {
   );
 };
 
-const Devtool = ({ weirdPid }: any) => {
+export const Devtool = ({ weirdPid }: any) => {
   // live synced with parent state
   const { count } = kyju.useDistributedContext<typeof IdkContext>("IdkContext");
 
@@ -85,10 +85,30 @@ export const IFrameEntrypoint = () => {
     </kyju.Controlled>
   );
 };
-
+// this wont render in the iframe, needs
 const IFrameDevtool = () => {
   const { count } = kyju.useDistributedContext<typeof IdkContext>("IdkContext");
-  return <div>
-    {count}
-  </div>;
+  return <kyju.IFrame count={count} name="leaf" />;
+};
+
+// another file boundary
+
+// below technically needs to be in a different file
+export const LeafWindowApp = () => {
+  return (
+    <kyju.Controlled name="leaf">
+      <Devtool />
+    </kyju.Controlled>
+  );
+};
+
+export const LeafDevtool = ({ weirdPid }: any) => {
+  const { count } = kyju.useDistributedContext<typeof IdkContext>("IdkContext");
+
+  return (
+    <div>
+      count:{count}
+      weird pid: {weirdPid}
+    </div>
+  );
 };
