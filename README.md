@@ -5,7 +5,7 @@
 A JavaScript library for building performant and reliable devtools on the web
 
 
-Early API examples in https://github.com/RobPruzan/kyju/tree/main/src/api
+Early API examples in [https://github.com/RobPruzan/kyju/tree/main/src/api](https://github.com/RobPruzan/kyju/blob/main/src/server-hooks/client.tsx)
 
 ## Why
 Building devtools on the web requires arcane browser knowledge. Existing tools are optimized for building web applications, which has little overlap with devtools. To name a few problems you will likely encounter when building a devtool:
