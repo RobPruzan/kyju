@@ -81,6 +81,8 @@ const Component = () => {
       {JSON.stringify(interactions)}
       {/* react query wrapper */}
       {contentMutation.error && <>{serverMutation.error}</>}
+
+
     </KyjuToolbar>
   );
 };
