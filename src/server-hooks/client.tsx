@@ -6,6 +6,21 @@ export const IdkContext = kyju.createDistributedContext<{
   setCount: Dispatch<SetStateAction<number>>;
 }>("IdkContext");
 
+export const ExampleApp = () => {
+  const [count, setCount] = useState();
+
+  return (
+    <IdkContext.Provider
+      value={{
+        count,
+        setCount,
+      }}
+    >
+      <Example />
+    </IdkContext.Provider>
+  );
+};
+
 const remoteConfig = {
   kind: "ws", // iframe supported
   // url: custom, or default
@@ -26,35 +41,26 @@ export const Example = () => {
     },
   });
   // can render to kyju toolbar, or to an external iframe
+  return <kyju.IFrame weirdPid={weirdPid} name="idk" />;
+};
+
+// below technically needs to be in a different file
+export const ParentWindowApp = () => {
   return (
-    <kyju.IFrame
-      context={{
-        weirdPid,
-      }}
-    >
-      <MillionLint />
-    </kyju.IFrame>
+    <kyju.Controlled name="idk">
+      <Devtool />
+    </kyju.Controlled>
   );
 };
 
-const MillionLint = () => {
+const Devtool = ({ weirdPid }: any) => {
   // live synced with parent state
-  const { weirdPid } = kyju.useDistributedContext("$parent-window");
-
-  return <div>{weirdPid}</div>;
-};
-
-export const App = () => {
-  const [count, setCount] = useState();
+  const { count } = kyju.useDistributedContext<typeof IdkContext>("IdkContext");
 
   return (
-    <IdkContext.Provider
-      value={{
-        count,
-        setCount,
-      }}
-    >
-      <Example />
-    </IdkContext.Provider>
+    <div>
+      count:{count}
+      weird pid: {weirdPid}
+    </div>
   );
 };

@@ -3,14 +3,13 @@ import { ServerDependency } from "./server-dependency";
 
 export const useRemoteHook = <T>({
   fn,
-  remoteConfig
+  remoteConfig,
 }: {
-  remoteConfig: any
+  remoteConfig: any;
   fn: ({
     dependencies,
   }: {
     dependencies: { someFunction: ServerDependency; process: { pid: number } };
-    
   }) => T;
 }): T => {
   // Implementation would go here
@@ -47,10 +46,13 @@ export const createDistributedContext = <T>(name: string): idk<T> => ({
 
 // this can allow for automatically synced devtools that move between website and vscode/cursor boundary, since
 // webview in electron would be reading from the same source, and they are connected to a hot reloader
-export const IFrame = ({
+export const IFrame = ({ name }: { name: string; } & Record<string,any>) =>
+  null;
+
+export const Controlled = ({
   children,
-  context,
+  name,
 }: {
   children: React.ReactNode;
-  context: any;
+  name: string;
 }) => children;
