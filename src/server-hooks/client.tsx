@@ -6,8 +6,14 @@ export const IdkContext = kyju.createDistributedContext<{
   setCount: Dispatch<SetStateAction<number>>;
 }>("IdkContext");
 
+const remoteConfig = {
+  kind: "ws", // iframe supported
+  // url: custom, or default
+};
+
 export const Example = () => {
-  const weirdPid = kyju.useServerHook({
+  const weirdPid = kyju.useRemoteHook({
+    remoteConfig,
     fn: ({ dependencies }) => {
       // you could just spin up a playwright browser here
       const { count } = dependencies.someFunction();
