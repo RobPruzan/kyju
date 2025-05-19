@@ -1,0 +1,27 @@
+goal:
+
+- get a remote hook working with server
+- need some sort of client def/ server def?
+- uh actually don't need to worry about type defs/ deps, just need a hardcoded example
+- need to serialize fn, send it over, make kyju available in scope during creation
+- when running hooks, need to bind it to the fiber that called it somehow
+- can access it with useState init value, so can just pass an id
+- that can just be a global map, i don't think we need any tree structure
+- there is no concept of components so yeah
+- idk if we need useDistributedContext for the demo, but i guess fine to consider
+- need some sort of concept of remote component call
+- can have a leaf that runs under the kyju entrypoint
+- reading needs to publish to a subscription via ws
+- that needs to generate a spec for a component + hook calls
+- which will be a kyju context read, which is wrapping useContext plus a way to discover the context to pass to useContext
+- means when we createDistributedContext we need a registry of tags to context, so we can just map
+- life cycle of the effect?
+- messaging with context is important
+- state updates propagated, state sets dispatched
+- update i guess is more important for now w.r.t effect life cycle
+- obviously needs to get sent over the message boundary
+- life cycles are definitely a little wack (bc async networking), but the semantics shouldn't be awful
+- can just send changed state in render fn if changed to live sync value, pretty easy
+- sending back a little more complex
+- all functions (deeply) in context need to be an rpc, that get executed on the client
+- er yeah that's about it i guess
