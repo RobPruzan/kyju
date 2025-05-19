@@ -1,5 +1,10 @@
-import { useEffect, useId } from "react";
-import { packRemote, sendToRemote } from "./internal";
+import { useContext, useEffect, useId } from "react";
+import {
+  contextTagMap,
+  packRemote,
+  sendToRemote,
+  useReadInternalContext,
+} from "./internal";
 
 export const useRemote = ({ fn }: { fn: () => void }) => {
   const fiberId = useId();
@@ -19,11 +24,22 @@ export const useRemote = ({ fn }: { fn: () => void }) => {
   });
 };
 
-export const createDistributedContext = () => {
+export const createDistributedContext = <T>(tag: string) => {
+  const contextMeta = {};
+  contextTagMap.set(tag, contextMeta);
+
   /** */
 };
 
-export const useDistributedContext = () => {
+export const useDistributedContext = (tag: string) => {
+  // internally needs to `use`
+  const contextMeta = useRemote({
+    // api obviously isn't expressive enough but i want this internally
+    fn: () => {
+      const contextMeta = useReadInternalContext(tag);
+      return contextMeta;
+    },
+  });
   /** */
 };
 

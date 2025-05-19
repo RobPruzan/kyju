@@ -38,7 +38,7 @@ window.addEventListener(
         existingEffectMaybe = newFiber;
         fiberMap.set(data.fiberId, newFiber);
       }
-      useEffectImpl(() => {}, []);
+      // useEffectImpl(() => {}, []);
     };
 
     const _ = unpackRemote(data.message);
@@ -114,4 +114,14 @@ export const RemoteComponentCallManager = () => {
   }, []);
 
   return components.map((component) => <></>);
+};
+
+export const useReadInternalContext = (tag: string) => {
+  const context = contextTagMap.get(tag);
+
+  if (!context) {
+    throw new Error("invariant for now");
+  }
+
+  return context;
 };
