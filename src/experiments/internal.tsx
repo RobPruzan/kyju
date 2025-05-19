@@ -1,5 +1,5 @@
 // need to be available in module
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useEffectImpl, useDistributedContext } from "./public";
 export const packRemote = (fn: () => void) => {};
 
@@ -100,18 +100,9 @@ export const html = (strings: TemplateStringsArray, ...values: any[]) =>
   String.raw({ raw: strings }, ...values);
 
 type todo = any;
+// oops don't think this is needed
 export const RemoteComponentCallManager = () => {
   const [components, setComponents] = useState<Array<todo>>();
-
-  useEffect(() => {
-    const iframe = document.getElementById("iframe") as HTMLIFrameElement;
-
-    if (!iframe.contentWindow) {
-      return;
-    }
-
-    iframe.contentWindow.addEventListener("message", () => {});
-  }, []);
 
   return components.map((component) => <></>);
 };
@@ -124,4 +115,27 @@ export const useReadInternalContext = (tag: string) => {
   }
 
   return context;
+};
+
+export const HookManager = () => {
+  const [contextLookups, setContextLookups] = useState<
+    Array<{ tag: string; returnTo: "idk-yet" }>
+  >([]);
+
+  contextLookups.map((ctxMeta) => {
+    const ctx = contextTagMap.get(ctxMeta.tag) as any;
+    const _ = useContext(ctx);
+  });
+
+  useEffect(() => {
+    const iframe = document.getElementById("iframe") as HTMLIFrameElement;
+
+    if (!iframe.contentWindow) {
+      return;
+    }
+
+    iframe.contentWindow.addEventListener("message", () => {});
+  }, []);
+
+  return null;
 };
