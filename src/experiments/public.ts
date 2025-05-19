@@ -33,14 +33,14 @@ export const createDistributedContext = <T>(tag: string) => {
 
 export const useDistributedContext = (tag: string) => {
   // internally needs to `use`
-  const contextMeta = useRemote({
+  const contextData = useRemote({
     // api obviously isn't expressive enough but i want this internally
     fn: () => {
-      const contextMeta = useReadInternalContext(tag);
-      return contextMeta;
+      const contextData = useReadInternalContext(tag);
+      return contextData;
     },
   });
-  /** */
+  return contextData;
 };
 
 export const useEffectImpl = (fn: () => void, deps: any[]) => {};

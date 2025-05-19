@@ -20,33 +20,56 @@ export const fiberMap = new Map<
 window.addEventListener(
   "message",
   (
-    e: MessageEvent<{
-      kind: "use-remote";
-      message: unknown;
-      fiberId: string;
-    }>
+    e: MessageEvent<
+      | {
+          kind: "context-return";
+          ctx: any;
+          returnTo: {
+            fiberId: string;
+            index: number;
+          };
+        }
+      | {
+          kind: "use-remote";
+          message: unknown;
+          fiberId: string;
+        }
+    >
   ) => {
-    const data = e.data;
+    switch (e.data.kind) {
+      case "use-remote": {
+        const data = e.data;
 
-    const useEffect = () => {
-      let existingEffectMaybe = fiberMap.get(data.fiberId);
-      if (!existingEffectMaybe) {
-        const newFiber = {
-          currentHookIndex: 0,
-          hooks: [],
+        const useEffect = () => {
+          let existingEffectMaybe = fiberMap.get(data.fiberId);
+          if (!existingEffectMaybe) {
+            const newFiber = {
+              currentHookIndex: 0,
+              hooks: [],
+            };
+            existingEffectMaybe = newFiber;
+            fiberMap.set(data.fiberId, newFiber);
+          }
+          // useEffectImpl(() => {}, []);
         };
-        existingEffectMaybe = newFiber;
-        fiberMap.set(data.fiberId, newFiber);
-      }
-      // useEffectImpl(() => {}, []);
-    };
 
-    const _ = unpackRemote(data.message);
+        const _ = unpackRemote(data.message);
+        return;
+      }
+      case "context-return": {
+        const fiber = fiberMap.get(e.data.returnTo.fiberId);
+        const associatedContext = fiber.hooks[e.data.returnTo.index];
+        // just a concept haven't decided how setting + resolving will work, probably just a promise/use interface
+        associatedContext.current = e.data.ctx;
+        associatedContext.resolve();
+        return;
+      }
+    }
   }
 );
 
-export const sendToParent = (message: any) => {
-  window.parent.postMessage(message, "*");
+export const sendToParent = (args: { kind: "ctx-return"; message: any }) => {
+  window.parent.postMessage(args, "*");
 };
 
 export const sendToRemote = (
@@ -100,12 +123,6 @@ export const html = (strings: TemplateStringsArray, ...values: any[]) =>
   String.raw({ raw: strings }, ...values);
 
 type todo = any;
-// oops don't think this is needed
-export const RemoteComponentCallManager = () => {
-  const [components, setComponents] = useState<Array<todo>>();
-
-  return components.map((component) => <></>);
-};
 
 export const useReadInternalContext = (tag: string) => {
   const context = contextTagMap.get(tag);
@@ -119,12 +136,26 @@ export const useReadInternalContext = (tag: string) => {
 
 export const HookManager = () => {
   const [contextLookups, setContextLookups] = useState<
-    Array<{ tag: string; returnTo: "idk-yet" }>
+    Array<{
+      tag: string;
+      returnTo: {
+        fiberId: string;
+        index: number;
+      };
+    }>
   >([]);
 
   contextLookups.map((ctxMeta) => {
     const ctx = contextTagMap.get(ctxMeta.tag) as any;
-    const _ = useContext(ctx);
+    const distributedCtx = useContext(ctx);
+
+    sendToParent({
+      kind: "ctx-return",
+      message: {
+        ctx: distributedCtx,
+        returnTo: ctxMeta.returnTo,
+      },
+    });
   });
 
   useEffect(() => {
