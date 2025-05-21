@@ -6,11 +6,17 @@ import { observeRequests } from "./network/network";
 import { useRemote } from "./experiments/public";
 import { IFrame, setupIframeListener } from "./experiments/internal";
 export { useRemote, setupIframeListener };
+declare global {
+  interface Window {
+    _appended?: boolean;
+  }
+}
 
-if (typeof document !== "undefined") {
+if (typeof document !== "undefined" && !window._appended) {
   const style = document.createElement("style");
   style.innerHTML = styles;
   document.head.append(style);
+  window._appended = true;
 }
 
 export const TestIFrame = () => {
@@ -24,8 +30,13 @@ export const Toolbar = () => {
     toolbarEventStore.subscribe,
     toolbarEventStore.getState
   );
+  console.log("running useRemote");
 
-  console.log("state ", toolbarState);
+  useRemote({
+    fn: () => {
+      console.log("I run in useRemote yippy");
+    },
+  });
 
   useEffect(() => {
     const unSub = startTimingTracking();
@@ -47,12 +58,9 @@ export const Toolbar = () => {
      */
     const unSub = observeRequests((data) => {
       setRequests((prev) => [...prev, data]);
-      console.log("req", data, performance.timeOrigin);
     });
     return unSub;
   }, []);
-  console.log("requests", requests);
-
   return (
     <motion.div
       className="flex flex-col justify-center items-center bg-black absolute bottom-1 right-1 rounded p-[5px]"

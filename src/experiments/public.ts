@@ -8,7 +8,7 @@ import {
 
 export const useRemote = ({ fn }: { fn: () => void }) => {
   const fiberId = useId();
-  const _ = packRemote(fn);
+  const remoteFn = packRemote(fn);
 
   useEffect(() => {
     sendToRemote({
@@ -19,7 +19,7 @@ export const useRemote = ({ fn }: { fn: () => void }) => {
 
   sendToRemote({
     kind: "use-remote",
-    message: _,
+    message: remoteFn,
     fiberId,
   });
 };

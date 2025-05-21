@@ -1,11 +1,7 @@
 import { TestIFrame, Toolbar, useRemote } from "kyju";
 
 function App() {
-  useRemote({
-    fn: () => {
-      console.log("I run");
-    },
-  });
+
   return (
     <>
       <TestIFrame />

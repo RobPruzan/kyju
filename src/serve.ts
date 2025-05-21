@@ -18,11 +18,9 @@ serve({
     }
 
     try {
-      const file = Bun.file("/Users/robby/kyju/dist/index.js");
-      console.log("file", file);
+      const file = Bun.file("/Users/robby/kyju/dist/auto.global.js");
 
       if (!(await file.exists())) {
-        console.log("nope", file);
 
         return new Response("Not found", { status: 404, headers: corsHeaders });
       }

@@ -7,7 +7,7 @@ export const packRemote = (fn: () => void) => {
 
 export const unpackRemote = (fnString: string) => {
   const fn = new Function(`return (${fnString})`)();
-  return fn();
+  return fn;
 };
 
 export const readRemoteContext = () => {};
@@ -36,7 +36,7 @@ export const setupIframeListener = () => {
           }
         | {
             kind: "use-remote";
-            message: unknown;
+            message: string;
             fiberId: string;
           }
       >
@@ -44,7 +44,6 @@ export const setupIframeListener = () => {
       switch (e.data.kind) {
         case "use-remote": {
           const data = e.data;
-          // console.log('got');
 
           const useEffect = () => {
             let existingEffectMaybe = fiberMap.get(data.fiberId);
@@ -59,7 +58,8 @@ export const setupIframeListener = () => {
             // useEffectImpl(() => {}, []);
           };
 
-          // const _ = unpackRemote(data.message);
+          const fn = unpackRemote(data.message);
+          fn();
           return;
         }
         case "context-return": {
@@ -91,20 +91,29 @@ export const sendToRemote = (
         fiberId: string;
       }
 ) => {
+  console.log("sending to remote");
+
   switch (args.kind) {
     case "use-remote": {
       const iframe = document.getElementById("iframe") as
         | HTMLIFrameElement
         | undefined;
       if (!iframe) {
-        console.log("no iframe");
+        console.log("no iframe found");
 
         return;
       }
       if (!iframe.contentWindow) {
         return;
       }
-      iframe.contentWindow.postMessage(args.message, "*");
+      iframe.contentWindow.postMessage(
+        {
+          kind: "use-remote",
+          message: args.message,
+          fiberId: args.fiberId,
+        },
+        "*"
+      );
       return;
     }
     case "effect": {
@@ -189,8 +198,6 @@ export const HookManager = () => {
       | undefined;
 
     if (!iframe) {
-      console.log("no iframe");
-
       return;
     }
     if (!iframe.contentWindow) {
