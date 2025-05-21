@@ -8,24 +8,22 @@ export default defineConfig([
     outDir: "dist",
     external: ["react", "react-dom"],
     sourcemap: false,
-    clean: true,
+    clean: false,
     tsconfig: "tsconfig.json",
     loader: {
       ".css": "text",
     },
-    onSuccess: "npm run build && node ./src/build-success.js",
   },
-  {
-    entry: ["src/auto.ts"],
-    format: ["iife"],
-    outDir: "dist",
-    outExtension: () => ({ js: ".global.js" }),
-    sourcemap: false,
-    clean: true,
-    tsconfig: "tsconfig.json",
-    loader: {
-      ".css": "text",
-    },
-    onSuccess: "npm run build && node ./src/build-success.js",
-  },
+  // {
+  //   entry: ["src/auto.ts"],
+  //   format: ["iife"],
+  //   outDir: "dist",
+  //   sourcemap: false,
+  //   clean: true,
+  //   tsconfig: "tsconfig.json",
+  //   loader: {
+  //     ".css": "text",
+  //   },
+  //   onSuccess: "npm run build && node ./src/build-success.js",
+  // },
 ]);

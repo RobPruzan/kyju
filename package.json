@@ -8,11 +8,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsup",
-    "dev": "nodemon --watch src --ext js,ts,tsx,jsx,css --exec \"npm run build && node ./src/build-success.js\"",
+    "build": "node ./src/pre-build.js && tsup",
     "build:css": "postcss ./src/styles.tailwind.css -o ./src/styles.css",
     "serve": "bun run --watch src/serve.ts",
-    "dev:tsup": "tsup --watch"
+    "dev": "tsup --watch"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,6 @@
   "description": "",
   "devDependencies": {
     "autoprefixer": "^10.4.21",
-    "bunchee": "^6.5.1",
     "nodemon": "^3.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3",
