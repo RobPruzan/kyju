@@ -1,8 +1,14 @@
-import { Toolbar } from "kyju";
+import { TestIFrame, Toolbar, useRemote } from "kyju";
 
 function App() {
+  useRemote({
+    fn: () => {
+      console.log("I run");
+    },
+  });
   return (
     <>
+      <TestIFrame />
       <button
         onClick={() => {
           fetch("https://jsonplaceholder.typicode.com/todos/1");

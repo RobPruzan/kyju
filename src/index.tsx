@@ -1,8 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import "./styles.css";
+import styles from "./styles.css";
 import { iife, startTimingTracking, toolbarEventStore } from "./utils";
 import { observeRequests } from "./network/network";
+import { useRemote } from "./experiments/public";
+import { IFrame, setupIframeListener } from "./experiments/internal";
+export { useRemote, setupIframeListener };
+
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.innerHTML = styles;
+  document.head.append(style);
+}
+
+export const TestIFrame = () => {
+  return <IFrame />;
+};
 
 export const Toolbar = () => {
   const [open, setOpen] = useState(false);

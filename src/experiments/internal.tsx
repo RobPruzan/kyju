@@ -1,9 +1,14 @@
 // need to be available in module
 import { useContext, useEffect, useState } from "react";
 import { useEffectImpl, useDistributedContext } from "./public";
-export const packRemote = (fn: () => void) => {};
+export const packRemote = (fn: () => void) => {
+  return fn.toString();
+};
 
-export const unpackRemote = (data: unknown) => {};
+export const unpackRemote = (fnString: string) => {
+  const fn = new Function(`return (${fnString})`)();
+  return fn();
+};
 
 export const readRemoteContext = () => {};
 
@@ -16,57 +21,59 @@ export const fiberMap = new Map<
     hooks: any[];
   }
 >();
-
-window.addEventListener(
-  "message",
-  (
-    e: MessageEvent<
-      | {
-          kind: "context-return";
-          ctx: any;
-          returnTo: {
-            fiberId: string;
-            index: number;
-          };
-        }
-      | {
-          kind: "use-remote";
-          message: unknown;
-          fiberId: string;
-        }
-    >
-  ) => {
-    switch (e.data.kind) {
-      case "use-remote": {
-        const data = e.data;
-
-        const useEffect = () => {
-          let existingEffectMaybe = fiberMap.get(data.fiberId);
-          if (!existingEffectMaybe) {
-            const newFiber = {
-              currentHookIndex: 0,
-              hooks: [],
+export const setupIframeListener = () => {
+  window.addEventListener(
+    "message",
+    (
+      e: MessageEvent<
+        | {
+            kind: "context-return";
+            ctx: any;
+            returnTo: {
+              fiberId: string;
+              index: number;
             };
-            existingEffectMaybe = newFiber;
-            fiberMap.set(data.fiberId, newFiber);
           }
-          // useEffectImpl(() => {}, []);
-        };
+        | {
+            kind: "use-remote";
+            message: unknown;
+            fiberId: string;
+          }
+      >
+    ) => {
+      switch (e.data.kind) {
+        case "use-remote": {
+          const data = e.data;
+          // console.log('got');
 
-        const _ = unpackRemote(data.message);
-        return;
-      }
-      case "context-return": {
-        const fiber = fiberMap.get(e.data.returnTo.fiberId);
-        const associatedContext = fiber.hooks[e.data.returnTo.index];
-        // just a concept haven't decided how setting + resolving will work, probably just a promise/use interface
-        associatedContext.current = e.data.ctx;
-        associatedContext.resolve();
-        return;
+          const useEffect = () => {
+            let existingEffectMaybe = fiberMap.get(data.fiberId);
+            if (!existingEffectMaybe) {
+              const newFiber = {
+                currentHookIndex: 0,
+                hooks: [],
+              };
+              existingEffectMaybe = newFiber;
+              fiberMap.set(data.fiberId, newFiber);
+            }
+            // useEffectImpl(() => {}, []);
+          };
+
+          // const _ = unpackRemote(data.message);
+          return;
+        }
+        case "context-return": {
+          const fiber = fiberMap.get(e.data.returnTo.fiberId);
+          const associatedContext = fiber.hooks[e.data.returnTo.index];
+          // just a concept haven't decided how setting + resolving will work, probably just a promise/use interface
+          associatedContext.current = e.data.ctx;
+          associatedContext.resolve();
+          return;
+        }
       }
     }
-  }
-);
+  );
+};
 
 export const sendToParent = (args: { kind: "ctx-return"; message: any }) => {
   window.parent.postMessage(args, "*");
@@ -86,7 +93,14 @@ export const sendToRemote = (
 ) => {
   switch (args.kind) {
     case "use-remote": {
-      const iframe = document.getElementById("iframe") as HTMLIFrameElement;
+      const iframe = document.getElementById("iframe") as
+        | HTMLIFrameElement
+        | undefined;
+      if (!iframe) {
+        console.log("no iframe");
+
+        return;
+      }
       if (!iframe.contentWindow) {
         return;
       }
@@ -94,7 +108,14 @@ export const sendToRemote = (
       return;
     }
     case "effect": {
-      const fiber = fiberMap.get(args.fiberId);
+      let fiber = fiberMap.get(args.fiberId);
+      if (!fiber) {
+        fiber = {
+          currentHookIndex: 0,
+          hooks: [],
+        };
+        fiberMap.set(args.fiberId, fiber);
+      }
       fiber.hooks.map((hook) => {
         // effect stuff todo
       });
@@ -104,19 +125,23 @@ export const sendToRemote = (
   }
 };
 
-export const createIframe = () => {
-  const iframe = document.createElement("iframe");
-
-  iframe.id = "test-iframe";
-  iframe.srcdoc = html`
-    <html>
-      <script>
-        /**
-         * stuff
-         */
-      </script>
-    </html>
-  `;
+export const IFrame = () => {
+  return (
+    <iframe
+      id="iframe"
+      srcDoc={`
+        <!DOCTYPE html>
+        <html>
+        <script>
+        console.log("iframe running")
+        </script>
+          <body>
+            <script src="http://localhost:7001"></script>
+          </body>
+        </html>
+      `}
+    />
+  );
 };
 
 export const html = (strings: TemplateStringsArray, ...values: any[]) =>
@@ -159,8 +184,15 @@ export const HookManager = () => {
   });
 
   useEffect(() => {
-    const iframe = document.getElementById("iframe") as HTMLIFrameElement;
+    const iframe = document.getElementById("iframe") as
+      | HTMLIFrameElement
+      | undefined;
 
+    if (!iframe) {
+      console.log("no iframe");
+
+      return;
+    }
     if (!iframe.contentWindow) {
       return;
     }

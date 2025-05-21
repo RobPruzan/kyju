@@ -8,9 +8,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bunchee",
+    "build": "tsup",
     "dev": "nodemon --watch src --ext js,ts,tsx,jsx,css --exec \"npm run build && node ./src/build-success.js\"",
-    "build:css": "postcss ./src/styles.tailwind.css -o ./src/styles.css"
+    "build:css": "postcss ./src/styles.tailwind.css -o ./src/styles.css",
+    "serve": "bun run --watch src/serve.ts",
+    "dev:tsup": "tsup --watch"
   },
   "repository": {
     "type": "git",
@@ -44,6 +46,7 @@
     "framer-motion": "^12.11.3",
     "postcss-cli": "^11.0.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tsup": "^8.5.0"
   }
 }
