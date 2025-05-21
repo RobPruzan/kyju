@@ -4,6 +4,7 @@
 
 A JavaScript library for building performant and reliable devtools on the web
 
+[Blog Post](https://www.rob.directory/blog/zenbu-devlog-8)
 
 Early API examples in [https://github.com/RobPruzan/kyju/tree/main/src/api](https://github.com/RobPruzan/kyju/blob/main/src/server-hooks/client.tsx)
 
