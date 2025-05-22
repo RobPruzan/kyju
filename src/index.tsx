@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import styles from "./styles.css";
@@ -31,11 +32,10 @@ export const Toolbar = () => {
     toolbarEventStore.getState
   );
   console.log("running useRemote");
-
-  useRemote({
-    fn: () => {
-      console.log("I run in useRemote yippy");
-    },
+  useRemote(({ useEffect }) => {
+    useEffect(() => {
+      console.log("running inside useEffect");
+    }, []);
   });
 
   useEffect(() => {

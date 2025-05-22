@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2020",
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "strict": true,
+    "moduleResolution": "bundler",
+    "jsxImportSource": "react",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true
+  },
+  "include": ["src/client/**/*", "src/**/*.d.ts", "src/index.tsx"]
+}
